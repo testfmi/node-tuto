@@ -93,3 +93,15 @@ class Coto {
     }
 
 }
+
+
+///
+
+// TODO get post data
+const buffers: Buffer[] = [];
+request.on('data', (chunk: Buffer) => {
+    buffers.push(chunk);
+}).on('end', () => {
+    const body = Buffer.concat(buffers).toString();
+
+
