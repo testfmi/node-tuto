@@ -14,39 +14,39 @@ const server = HTTP.createServer((request: IncomingMessage, response: ServerResp
     coto.get('/', () => {
 
         const incomingHttpHeaders: IncomingHttpHeaders = request.headers;
-        
-            for (const key in incomingHttpHeaders) {
-                console.log(`${key}: ${incomingHttpHeaders[key]}`);
-            }
-        
-            const { method, url } = request;
-            const { headers } = request;
-            const userAgent = headers['user-agent'];
-        
-            const res: any = {};
-                
-            res['request'] = {
-                headers: request.headers,
-                httpVersion: request.httpVersion,
-                method: request.method,
-                trailers: request.trailers,
-                statusCode: request.statusCode,
-                statusMessage: request.statusMessage,
-                url: request.url,
-            };
-        
-        
-            res['parsed url'] = urlParse(request.url);
-            // res['parsed testURL'] = urlParse(testURL);
-        
-            // response.setHeader('Content-Type', 'text/html');
-            response.setHeader('Content-Type', 'application/json');
-            response.setHeader('toto', 'totobar');
-            response.writeHead(200, 'tout est ok !');
-        
-            // response.write(JSON.stringify(request.headers));
-            response.write(JSON.stringify(res));
-            response.end();
+
+        for (const key in incomingHttpHeaders) {
+            console.log(`${key}: ${incomingHttpHeaders[key]}`);
+        }
+
+        const {method, url} = request;
+        const {headers} = request;
+        const userAgent = headers['user-agent'];
+
+        const res: any = {};
+
+        res['request'] = {
+            headers: request.headers,
+            httpVersion: request.httpVersion,
+            method: request.method,
+            trailers: request.trailers,
+            statusCode: request.statusCode,
+            statusMessage: request.statusMessage,
+            url: request.url,
+        };
+
+
+        res['parsed url'] = urlParse(request.url);
+        // res['parsed testURL'] = urlParse(testURL);
+
+        // response.setHeader('Content-Type', 'text/html');
+        response.setHeader('Content-Type', 'application/json');
+        response.setHeader('toto', 'totobar');
+        response.writeHead(200, 'tout est ok !');
+
+        // response.write(JSON.stringify(request.headers));
+        response.write(JSON.stringify(res));
+        response.end();
 
     });
 
@@ -58,10 +58,23 @@ const server = HTTP.createServer((request: IncomingMessage, response: ServerResp
         res.end();
     });
 
+    coto.post('/', (req: IncomingMessage, res: ServerResponse) => {
+        // find POST body data
+        const buffers: Buffer[] = [];
+        req.on('data', (chunk: Buffer) => {
+            buffers.push(chunk);
+        }).on('end', () => {
+            const body = Buffer.concat(buffers).toString();
 
+            response.setHeader('Content-Type', 'application/json');
+            response.writeHead(200);
+
+            response.write(JSON.stringify(body));
+            response.end();
+        });
+    });
 
 });
-
 
 server.listen(3000);
 
@@ -92,16 +105,10 @@ class Coto {
         this.method('GET', pathname, f);
     }
 
+    post(pathname: string, f: (request: IncomingMessage, response: ServerResponse) => void): void {
+        this.method('POST', pathname, f);
+    }
+
 }
-
-
-///
-
-// TODO get post data
-const buffers: Buffer[] = [];
-request.on('data', (chunk: Buffer) => {
-    buffers.push(chunk);
-}).on('end', () => {
-    const body = Buffer.concat(buffers).toString();
 
 
