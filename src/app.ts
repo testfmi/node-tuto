@@ -74,17 +74,22 @@ const server = HTTP.createServer((request: IncomingMessage, response: ServerResp
         });
     });
 
+    coto.else((req: IncomingMessage, res: ServerResponse) => {
+        res.setHeader('Content-Type', 'text/html');
+        res.writeHead(200);
+        res.write('<h1>404 not found</h1><h2>(else)</h2>');
+        res.end();
+    });
+
 });
 
 server.listen(3000);
-
-
-
 
 class Coto {
 
     private request: IncomingMessage;
     private response: ServerResponse;
+    private hasAnswered = false;
 
     constructor(request: IncomingMessage, response: ServerResponse) {
         if (request == null) { throw Error('erreur'); }
@@ -92,23 +97,33 @@ class Coto {
         this.response = response;
     }
 
-    private method(verb: string, pathname: string, f: (request: IncomingMessage, response: ServerResponse) => void): void {
-      const { method } = this.request;
-        const urlWithStringQuery: UrlWithStringQuery = urlParse(this.request.url);
+    private httpMethod = (verb: HTTP_VERB) =>
+        (pathname: string, f: (request: IncomingMessage, response: ServerResponse) => void) => {
+            const { method } = this.request;
+            const urlWithStringQuery: UrlWithStringQuery = urlParse(this.request.url);
 
-        if (method === verb && urlWithStringQuery.pathname === pathname) {
+            if (method === HTTP_VERB[verb] && urlWithStringQuery.pathname === pathname) {
+                this.performResponse(f);
+            }
+        }
+
+    get = this.httpMethod(HTTP_VERB.GET);
+    post = this.httpMethod(HTTP_VERB.POST);
+    else = (f: (request: IncomingMessage, response: ServerResponse) => void) => {
+        this.performResponse(f);
+    }
+
+
+    private performResponse = (f: (request: IncomingMessage, response: ServerResponse) => void) => {
+        if(!this.hasAnswered) {
+            this.hasAnswered = true
             f(this.request, this.response);
         }
     }
-
-    get(pathname: string, f: (request: IncomingMessage, response: ServerResponse) => void): void {
-        this.method('GET', pathname, f);
-    }
-
-    post(pathname: string, f: (request: IncomingMessage, response: ServerResponse) => void): void {
-        this.method('POST', pathname, f);
-    }
-
 }
 
 
+enum HTTP_VERB {
+    GET = 'GET',
+    POST = 'POST',
+}

@@ -54,28 +54,45 @@ const server = HTTP.createServer((request, response) => {
             response.end();
         });
     });
+    coto.else((req, res) => {
+        res.setHeader('Content-Type', 'text/html');
+        res.writeHead(200);
+        res.write('<h1>404 not found</h1><h2>(else)</h2>');
+        res.end();
+    });
 });
 server.listen(3000);
 class Coto {
     constructor(request, response) {
+        this.hasAnswered = false;
+        this.httpMethod = (verb) => (pathname, f) => {
+            const { method } = this.request;
+            const urlWithStringQuery = url_1.parse(this.request.url);
+            if (method === HTTP_VERB[verb] && urlWithStringQuery.pathname === pathname) {
+                this.performResponse(f);
+            }
+        };
+        this.get = this.httpMethod(HTTP_VERB.GET);
+        this.post = this.httpMethod(HTTP_VERB.POST);
+        this.else = (f) => {
+            this.performResponse(f);
+        };
+        this.performResponse = (f) => {
+            if (!this.hasAnswered) {
+                this.hasAnswered = true;
+                f(this.request, this.response);
+            }
+        };
         if (request == null) {
             throw Error('erreur');
         }
         this.request = request;
         this.response = response;
     }
-    method(verb, pathname, f) {
-        const { method } = this.request;
-        const urlWithStringQuery = url_1.parse(this.request.url);
-        if (method === verb && urlWithStringQuery.pathname === pathname) {
-            f(this.request, this.response);
-        }
-    }
-    get(pathname, f) {
-        this.method('GET', pathname, f);
-    }
-    post(pathname, f) {
-        this.method('POST', pathname, f);
-    }
 }
+var HTTP_VERB;
+(function (HTTP_VERB) {
+    HTTP_VERB["GET"] = "GET";
+    HTTP_VERB["POST"] = "POST";
+})(HTTP_VERB || (HTTP_VERB = {}));
 //# sourceMappingURL=app.js.map
