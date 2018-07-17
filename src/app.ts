@@ -1,11 +1,8 @@
-import { IncomingHttpHeaders, IncomingMessage, ServerResponse } from 'http';
+import { IncomingMessage, ServerResponse } from 'http';
 import { parse as urlParse } from 'url';
 import {Coto} from "./coto";
 const HTTP = require('http');
-// const URL = require('url');
-
-
-const testURL = 'https://user:pass@sub.host.com:8080/p/a/t/h?query=string#hash';
+// const URL = require('url'); // alternative
 
 
 const server = HTTP.createServer((request: IncomingMessage, response: ServerResponse) => {
@@ -14,15 +11,9 @@ const server = HTTP.createServer((request: IncomingMessage, response: ServerResp
 
     coto.get('/', () => {
 
-        const incomingHttpHeaders: IncomingHttpHeaders = request.headers;
-
-        for (const key in incomingHttpHeaders) {
-            console.log(`${key}: ${incomingHttpHeaders[key]}`);
-        }
-
-        const {method, url} = request;
-        const {headers} = request;
-        const userAgent = headers['user-agent'];
+        // const {method, url} = request;  // alternative
+        // const {headers} = request;  // alternative
+        // const userAgent = headers['user-agent'];  // alternative
 
         const res: any = {};
 
@@ -38,7 +29,7 @@ const server = HTTP.createServer((request: IncomingMessage, response: ServerResp
 
 
         res['parsed url'] = urlParse(request.url);
-        res['parsed testURL'] = urlParse(testURL);
+        res['parsed testURL'] = urlParse('https://user:pass@sub.host.com:8080/p/a/t/h?query=string#hash');
 
         // response.setHeader('Content-Type', 'text/html');
         response.setHeader('Content-Type', 'application/json');
@@ -83,6 +74,5 @@ const server = HTTP.createServer((request: IncomingMessage, response: ServerResp
     });
 
 });
-
 server.listen(3000);
 

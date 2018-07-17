@@ -19,26 +19,27 @@ export class Coto {
     }
 
     private performResponse = (f: (request: IncomingMessage, response: ServerResponse) => void) => {
+
+        console.log('Coto request.url:', this.request.url);
+
         if(!this.hasAnswered) {
-            this.hasAnswered = true
+            this.hasAnswered = true;
             f(this.request, this.response);
         }
     }
 
     private httpMethod = (verb: HTTP_VERB) =>
-        (pathname: string, f: (request: IncomingMessage, response: ServerResponse) => void) => {
-            const { method } = this.request;
+         (pathname: string, f: (request: IncomingMessage, response: ServerResponse) => void) => {
+            const {method} = this.request;
             const urlWithStringQuery: UrlWithStringQuery = urlParse(this.request.url);
 
             if (method === HTTP_VERB[verb] && urlWithStringQuery.pathname === pathname) {
                 this.performResponse(f);
             }
-        }
+        };
 
-    get = this.httpMethod(HTTP_VERB.GET);
-    post = this.httpMethod(HTTP_VERB.POST);
-    else = (f: (request: IncomingMessage, response: ServerResponse) => void) => {
-        this.performResponse(f);
-    }
+    public get = this.httpMethod(HTTP_VERB.GET);
+    public post = this.httpMethod(HTTP_VERB.POST);
+    public else = this.performResponse;
 }
 
