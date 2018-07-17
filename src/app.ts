@@ -9,38 +9,12 @@ const server = HTTP.createServer((request: IncomingMessage, response: ServerResp
 
     const coto: Coto = new Coto(request, response);
 
-    coto.get('/', () => {
-
-        // const {method, url} = request;  // alternative
-        // const {headers} = request;  // alternative
-        // const userAgent = headers['user-agent'];  // alternative
-
-        const res: any = {};
-
-        res['request'] = {
-            headers: request.headers,
-            httpVersion: request.httpVersion,
-            method: request.method,
-            trailers: request.trailers,
-            statusCode: request.statusCode,
-            statusMessage: request.statusMessage,
-            url: request.url,
-        };
-
-
-        res['parsed url'] = urlParse(request.url);
-        res['parsed testURL'] = urlParse('https://user:pass@sub.host.com:8080/p/a/t/h?query=string#hash');
-
-        // response.setHeader('Content-Type', 'text/html');
-        response.setHeader('Content-Type', 'application/json');
-        response.setHeader('toto', 'totobar');
-        response.writeHead(200, 'tout est ok !');
-
-        // response.write(JSON.stringify(request.headers));
-        response.write(JSON.stringify(res));
-        response.end();
-
-    });
+    // TODO: get index.html file
+    // coto.get('/', (req: IncomingMessage, res: ServerResponse) => {
+    //
+    //
+    //
+    // });
 
     coto.get('/info', (req: IncomingMessage, res: ServerResponse) => {
         res.setHeader('Content-Type', 'text/html');
@@ -49,6 +23,15 @@ const server = HTTP.createServer((request: IncomingMessage, response: ServerResp
         res.write('<h1>Info yeah</h1>');
         res.end();
     });
+
+
+    coto.get('/404', (req: IncomingMessage, res: ServerResponse) => {
+        res.setHeader('Content-Type', 'text/html');
+        res.writeHead(200);
+        res.write('<h1>404 not found</h1><h2>(else)</h2>');
+        res.end();
+    });
+
 
     coto.post('/', (req: IncomingMessage, res: ServerResponse) => {
         // find POST body data
@@ -66,11 +49,33 @@ const server = HTTP.createServer((request: IncomingMessage, response: ServerResp
         });
     });
 
+
     coto.else((req: IncomingMessage, res: ServerResponse) => {
-        res.setHeader('Content-Type', 'text/html');
-        res.writeHead(200);
-        res.write('<h1>404 not found</h1><h2>(else)</h2>');
-        res.end();
+
+        const txt: any = {};
+
+        txt['request'] = {
+            headers: request.headers,
+            httpVersion: request.httpVersion,
+            method: request.method,
+            trailers: request.trailers,
+            statusCode: request.statusCode,
+            statusMessage: request.statusMessage,
+            url: request.url,
+        };
+
+
+        txt['parsed url'] = urlParse(request.url);
+        txt['parsed testURL'] = urlParse('https://user:pass@sub.host.com:8080/p/a/t/h?query=string#hash');
+
+        // response.setHeader('Content-Type', 'text/html');
+        response.setHeader('Content-Type', 'application/json');
+        response.setHeader('toto', 'totobar');
+        response.writeHead(200, 'tout est ok !');
+
+        // response.write(JSON.stringify(request.headers));
+        response.write(JSON.stringify(txt));
+        response.end();
     });
 
 });

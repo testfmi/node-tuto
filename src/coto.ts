@@ -40,6 +40,8 @@ export class Coto {
 
     public get = this.httpMethod(HTTP_VERB.GET);
     public post = this.httpMethod(HTTP_VERB.POST);
+
+    // this should be placed after all others http methods
     public else = this.performResponse;
 }
 
