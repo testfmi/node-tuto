@@ -1,10 +1,11 @@
 import { IncomingHttpHeaders, IncomingMessage, ServerResponse } from 'http';
-import { parse as urlParse, UrlWithStringQuery } from 'url';
+import { parse as urlParse } from 'url';
+import {Coto} from "./coto";
 const HTTP = require('http');
 // const URL = require('url');
 
 
-const testURL = urlParse('https://user:pass@sub.host.com:8080/p/a/t/h?query=string#hash');
+const testURL = 'https://user:pass@sub.host.com:8080/p/a/t/h?query=string#hash';
 
 
 const server = HTTP.createServer((request: IncomingMessage, response: ServerResponse) => {
@@ -37,7 +38,7 @@ const server = HTTP.createServer((request: IncomingMessage, response: ServerResp
 
 
         res['parsed url'] = urlParse(request.url);
-        // res['parsed testURL'] = urlParse(testURL);
+        res['parsed testURL'] = urlParse(testURL);
 
         // response.setHeader('Content-Type', 'text/html');
         response.setHeader('Content-Type', 'application/json');
@@ -85,45 +86,3 @@ const server = HTTP.createServer((request: IncomingMessage, response: ServerResp
 
 server.listen(3000);
 
-class Coto {
-
-    private request: IncomingMessage;
-    private response: ServerResponse;
-    private hasAnswered = false;
-
-    constructor(request: IncomingMessage, response: ServerResponse) {
-        if (request == null) { throw Error('erreur'); }
-        this.request = request;
-        this.response = response;
-    }
-
-    private httpMethod = (verb: HTTP_VERB) =>
-        (pathname: string, f: (request: IncomingMessage, response: ServerResponse) => void) => {
-            const { method } = this.request;
-            const urlWithStringQuery: UrlWithStringQuery = urlParse(this.request.url);
-
-            if (method === HTTP_VERB[verb] && urlWithStringQuery.pathname === pathname) {
-                this.performResponse(f);
-            }
-        }
-
-    get = this.httpMethod(HTTP_VERB.GET);
-    post = this.httpMethod(HTTP_VERB.POST);
-    else = (f: (request: IncomingMessage, response: ServerResponse) => void) => {
-        this.performResponse(f);
-    }
-
-
-    private performResponse = (f: (request: IncomingMessage, response: ServerResponse) => void) => {
-        if(!this.hasAnswered) {
-            this.hasAnswered = true
-            f(this.request, this.response);
-        }
-    }
-}
-
-
-enum HTTP_VERB {
-    GET = 'GET',
-    POST = 'POST',
-}
